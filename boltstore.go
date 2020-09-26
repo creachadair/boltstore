@@ -18,6 +18,7 @@ package boltstore
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/creachadair/ffs/blob"
 	"go.etcd.io/bbolt"
@@ -33,16 +34,24 @@ type Store struct {
 // with the store package.
 func Opener(_ context.Context, addr string) (blob.Store, error) {
 	// TODO: Parse other options out of the address string somehow.
-	return Open(addr, 0600, nil)
+	return Open(addr, 0600, &bbolt.Options{
+		NoFreelistSync: true,
+		FreelistType:   bbolt.FreelistMapType,
+	})
 }
 
 // Open creates a Store by opening the bbolt database specified by opts.
+// If path has the form name@path, name is used as the bucket label.
 func Open(path string, mode os.FileMode, opts *bbolt.Options) (*Store, error) {
+	bucket := "0"
+	if i := strings.Index(path, "@"); i > 0 {
+		bucket, path = path[:i], path[i+1:]
+	}
 	db, err := bbolt.Open(path, mode, opts)
 	if err != nil {
 		return nil, err
 	}
-	s := &Store{db: db, bucket: []byte("0")}
+	s := &Store{db: db, bucket: []byte(bucket)}
 	if err := db.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(s.bucket)
 		return err
