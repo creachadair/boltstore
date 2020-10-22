@@ -38,7 +38,7 @@ func TestStore(t *testing.T) {
 		defer os.RemoveAll(dir) // best effort cleanup
 	}
 
-	s, err := boltstore.Open(path, 0644, nil)
+	s, err := boltstore.Open(path, nil)
 	if err != nil {
 		t.Fatalf("Creating store at %q: %v", path, err)
 	}

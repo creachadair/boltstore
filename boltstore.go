@@ -31,27 +31,24 @@ type Store struct {
 }
 
 // Opener constructs a filestore from an address comprising a path, for use
-// with the store package.
+// with the store package. If addr has the form name@path, the name is used as
+// the bucket label.
 func Opener(_ context.Context, addr string) (blob.Store, error) {
 	// TODO: Parse other options out of the address string somehow.
-	return Open(addr, 0600, &bbolt.Options{
-		NoFreelistSync: true,
-		FreelistType:   bbolt.FreelistMapType,
-	})
+	path, bucket := addr, ""
+	if i := strings.Index(addr, "@"); i > 0 {
+		path, bucket = path[i+1:], path[:i]
+	}
+	return Open(path, &Options{Bucket: bucket})
 }
 
 // Open creates a Store by opening the bbolt database specified by opts.
-// If path has the form name@path, name is used as the bucket label.
-func Open(path string, mode os.FileMode, opts *bbolt.Options) (*Store, error) {
-	bucket := "0"
-	if i := strings.Index(path, "@"); i > 0 {
-		bucket, path = path[:i], path[i+1:]
-	}
-	db, err := bbolt.Open(path, mode, opts)
+func Open(path string, opts *Options) (*Store, error) {
+	db, err := bbolt.Open(path, opts.fileMode(), opts.boltOptions())
 	if err != nil {
 		return nil, err
 	}
-	s := &Store{db: db, bucket: []byte(bucket)}
+	s := &Store{db: db, bucket: []byte(opts.bucket("blobs"))}
 	if err := db.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(s.bucket)
 		return err
@@ -59,6 +56,37 @@ func Open(path string, mode os.FileMode, opts *bbolt.Options) (*Store, error) {
 		return nil, err
 	}
 	return s, nil
+}
+
+// Options provides options for opening a bbolt database.
+type Options struct {
+	Mode        os.FileMode
+	Bucket      string
+	BoltOptions *bbolt.Options
+}
+
+func (o *Options) fileMode() os.FileMode {
+	if o == nil || o.Mode == 0 {
+		return 0600
+	}
+	return o.Mode
+}
+
+func (o *Options) bucket(fallback string) string {
+	if o == nil || o.Bucket == "" {
+		return fallback
+	}
+	return o.Bucket
+}
+
+func (o *Options) boltOptions() *bbolt.Options {
+	if o == nil || o.BoltOptions == nil {
+		return &bbolt.Options{
+			NoFreelistSync: true,
+			FreelistType:   bbolt.FreelistMapType,
+		}
+	}
+	return o.BoltOptions
 }
 
 // Close implements the io.Closer interface. It closes the underlying database
