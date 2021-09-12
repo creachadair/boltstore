@@ -144,12 +144,12 @@ func (s *Store) Delete(_ context.Context, key string) error {
 		return blob.KeyNotFound(key) // bolt cannot store empty keys
 	}
 	return s.db.Update(func(tx *bbolt.Tx) error {
-		key := []byte(key)
+		byteKey := []byte(key)
 		b := tx.Bucket(s.bucket)
-		if b.Get(key) == nil {
+		if b.Get(byteKey) == nil {
 			return blob.KeyNotFound(key)
 		}
-		return b.Delete(key)
+		return b.Delete(byteKey)
 	})
 }
 
