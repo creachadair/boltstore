@@ -96,12 +96,12 @@ func (s *Store) Close() error { return s.db.Close() }
 // Get implements part of blob.Store.
 func (s *Store) Get(_ context.Context, key string) (data []byte, err error) {
 	if key == "" {
-		return nil, blob.ErrKeyNotFound // bolt does not store empty keys
+		return nil, blob.KeyNotFound(key) // bolt does not store empty keys
 	}
 	err = s.db.View(func(tx *bbolt.Tx) error {
 		data = tx.Bucket(s.bucket).Get([]byte(key))
 		if data == nil {
-			return blob.ErrKeyNotFound
+			return blob.KeyNotFound(key)
 		}
 		return nil
 	})
@@ -116,7 +116,7 @@ func (s *Store) Put(_ context.Context, opts blob.PutOptions) error {
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(s.bucket)
 		if !opts.Replace && b.Get(key) != nil {
-			return blob.ErrKeyExists
+			return blob.KeyExists(opts.Key)
 		}
 		return b.Put(key, opts.Data)
 	})
@@ -125,12 +125,12 @@ func (s *Store) Put(_ context.Context, opts blob.PutOptions) error {
 // Size implements part of blob.Store.
 func (s *Store) Size(_ context.Context, key string) (size int64, err error) {
 	if key == "" {
-		return 0, blob.ErrKeyNotFound // badger cannot store empty keys
+		return 0, blob.KeyNotFound(key) // bolt cannot store empty keys
 	}
 	err = s.db.View(func(tx *bbolt.Tx) error {
 		data := tx.Bucket(s.bucket).Get([]byte(key))
 		if data == nil {
-			return blob.ErrKeyNotFound
+			return blob.KeyNotFound(key)
 		}
 		size = int64(len(data))
 		return nil
@@ -141,13 +141,13 @@ func (s *Store) Size(_ context.Context, key string) (size int64, err error) {
 // Delete implements part of blob.Store.
 func (s *Store) Delete(_ context.Context, key string) error {
 	if key == "" {
-		return blob.ErrKeyNotFound // badger cannot store empty keys
+		return blob.KeyNotFound(key) // bolt cannot store empty keys
 	}
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		key := []byte(key)
 		b := tx.Bucket(s.bucket)
 		if b.Get(key) == nil {
-			return blob.ErrKeyNotFound
+			return blob.KeyNotFound(key)
 		}
 		return b.Delete(key)
 	})
