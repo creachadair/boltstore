@@ -30,9 +30,9 @@ type Store struct {
 	bucket []byte
 }
 
-// Opener constructs a filestore from an address comprising a path, for use
-// with the store package. If addr has the form name@path, the name is used as
-// the bucket label.
+// Opener constructs a Store from an address comprising a path, for use with
+// the store package. If addr has the form name@path, the name is used as the
+// bucket label.
 func Opener(_ context.Context, addr string) (blob.Store, error) {
 	// TODO: Parse other options out of the address string somehow.
 	path, bucket := addr, ""
