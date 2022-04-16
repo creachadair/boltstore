@@ -3,7 +3,7 @@ module github.com/creachadair/boltstore
 go 1.17
 
 require (
-	github.com/creachadair/ffs v0.0.0-20220322155852-b9ea0b340867
+	github.com/creachadair/ffs v0.0.0-20220416191121-07217a8a1b12
 	go.etcd.io/bbolt v1.3.6
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 )
