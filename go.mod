@@ -3,9 +3,9 @@ module github.com/creachadair/boltstore
 go 1.17
 
 require (
-	github.com/creachadair/ffs v0.0.0-20220416213235-6388f88050e4
+	github.com/creachadair/ffs v0.0.0-20220419003249-eb3987a12062
 	go.etcd.io/bbolt v1.3.6
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
 )
 
 require github.com/google/go-cmp v0.5.7 // indirect
