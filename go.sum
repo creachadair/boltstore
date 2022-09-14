@@ -1,9 +1,9 @@
-github.com/creachadair/ffs v0.0.0-20220907200421-9d347a09fa6c h1:K1QV9Eop5oaOBV6ix5akDGpCv0+uGYUMaat9U+wq5PM=
-github.com/creachadair/ffs v0.0.0-20220907200421-9d347a09fa6c/go.mod h1:POAz0qW5XLzTbOKgZCgHAG9X/SF1KkrBCo+3GwphXL8=
-github.com/google/go-cmp v0.5.8 h1:e6P7q2lk1O+qJJb4BtCQXlK8vWEO8V1ZeuEdJNOqZyg=
-github.com/google/go-cmp v0.5.8/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/creachadair/ffs v0.0.0-20220908160439-54e882e3a782 h1:Uc4cCdcFiTh+HbdvVhngJ24Dl/5F1qWdWXwVJYHNPnk=
+github.com/creachadair/ffs v0.0.0-20220908160439-54e882e3a782/go.mod h1:/p+ufChXu+ewOD1ijNhbgEzE5oDcsqvWr5WzqG6Z6/0=
+github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
+github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
 go.etcd.io/bbolt v1.3.6/go.mod h1:qXsaaIqmgQH0T+OPdb99Bf+PKfBBQVAdyD6TY9G8XM4=
 golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20220908150016-7ac13a9a928d h1:RoyzQTK76Rktm3p4xyZslc8T8I1tBz4UEjZCzeh57mM=
-golang.org/x/sys v0.0.0-20220908150016-7ac13a9a928d/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220913175220-63ea55921009 h1:PuvuRMeLWqsf/ZdT1UUZz0syhioyv1mzuFZsXs4fvhw=
+golang.org/x/sys v0.0.0-20220913175220-63ea55921009/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
