@@ -1,9 +1,9 @@
-github.com/creachadair/ffs v0.0.0-20221007183403-6a10e72d7406 h1:1FKo9FklKOjtPXudF3otR3p3sMyAZyGNwxoEOAMpu34=
-github.com/creachadair/ffs v0.0.0-20221007183403-6a10e72d7406/go.mod h1:rwOx18qFrmVROESKSdFoDoJJQ2NM1quGOn5caVPskYA=
+github.com/creachadair/ffs v0.0.0-20221011220421-0b65cfffbf3c h1:ihLLpJSEtK1fH8kXwFoUEcoJrk2y4sb6rXwUf9BHu0s=
+github.com/creachadair/ffs v0.0.0-20221011220421-0b65cfffbf3c/go.mod h1:QJpiT9aVcYZxfGWx3cgBk6lBmUcXH8ux9JsAbqj7Yn0=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
 go.etcd.io/bbolt v1.3.6/go.mod h1:qXsaaIqmgQH0T+OPdb99Bf+PKfBBQVAdyD6TY9G8XM4=
 golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20221006211917-84dc82d7e875 h1:AzgQNqF+FKwyQ5LbVrVqOcuuFB67N47F9+htZYH0wFM=
-golang.org/x/sys v0.0.0-20221006211917-84dc82d7e875/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20221010170243-090e33056c14 h1:k5II8e6QD8mITdi+okbbmR/cIyEbeXLBhy5Ha4nevyc=
+golang.org/x/sys v0.0.0-20221010170243-090e33056c14/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
