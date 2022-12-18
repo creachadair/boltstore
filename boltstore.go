@@ -154,13 +154,15 @@ func (s *Store) Delete(_ context.Context, key string) error {
 }
 
 // List implements part of blob.Store.
-func (s *Store) List(_ context.Context, start string, f func(string) error) error {
+func (s *Store) List(ctx context.Context, start string, f func(string) error) error {
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		c := tx.Bucket(s.bucket).Cursor()
 
 		k, _ := c.Seek([]byte(start))
 		for k != nil {
 			if err := f(string(k)); err != nil {
+				return err
+			} else if err := ctx.Err(); err != nil {
 				return err
 			}
 			k, _ = c.Next()
