@@ -99,13 +99,20 @@ func (s *Store) Get(_ context.Context, key string) (data []byte, err error) {
 		return nil, blob.KeyNotFound(key) // bolt does not store empty keys
 	}
 	err = s.db.View(func(tx *bbolt.Tx) error {
-		data = tx.Bucket(s.bucket).Get([]byte(key))
-		if data == nil {
+		value := tx.Bucket(s.bucket).Get([]byte(key))
+		if value == nil {
 			return blob.KeyNotFound(key)
 		}
+		data = copyOf(value)
 		return nil
 	})
 	return
+}
+
+func copyOf(data []byte) []byte {
+	cp := make([]byte, len(data))
+	copy(cp, data)
+	return cp
 }
 
 // Put implements part of blob.Store.
