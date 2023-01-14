@@ -1,5 +1,7 @@
-github.com/creachadair/ffs v0.0.0-20230104000224-ca474c4162dc h1:K9dH5ZCbDWDMpLoQXAdFkEf2V7zbrxQIxAmNjzww32M=
-github.com/creachadair/ffs v0.0.0-20230104000224-ca474c4162dc/go.mod h1:XZoVFVGbeigae0P8r+7QkazaTsA3iDHz8txbJ1e6Ivg=
+github.com/creachadair/ffs v0.0.0-20230114064141-35883d7e7d11 h1:S0BlDi1ZdePJB/RhZt6bg8617TJmK2cJhuXW7o7Dh4o=
+github.com/creachadair/ffs v0.0.0-20230114064141-35883d7e7d11/go.mod h1:8HwZs7UiDTSga4ZaBnlDeP0pa4ytsehWZ0NZGz9vdAE=
+github.com/creachadair/mds v0.0.0-20230112232013-549c3f4fe455 h1:RZDQcXw5WKyu+R7se/NUDQodBxrXOuZWAm0miRdfMoU=
+github.com/creachadair/mds v0.0.0-20230112232013-549c3f4fe455/go.mod h1:caBACU+n1Q/rZ252FTzfnG0/H+ZUi+UnIQtEOraMv/g=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=
