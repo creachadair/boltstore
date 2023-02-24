@@ -127,22 +127,6 @@ func (s *Store) Put(_ context.Context, opts blob.PutOptions) error {
 	})
 }
 
-// Size implements part of blob.Store.
-func (s *Store) Size(_ context.Context, key string) (size int64, err error) {
-	if key == "" {
-		return 0, blob.KeyNotFound(key) // bolt cannot store empty keys
-	}
-	err = s.db.View(func(tx *bbolt.Tx) error {
-		data := tx.Bucket(s.bucket).Get([]byte(key))
-		if data == nil {
-			return blob.KeyNotFound(key)
-		}
-		size = int64(len(data))
-		return nil
-	})
-	return
-}
-
 // Delete implements part of blob.Store.
 func (s *Store) Delete(_ context.Context, key string) error {
 	if key == "" {
