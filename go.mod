@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/creachadair/ffs v0.0.2
 	go.etcd.io/bbolt v1.3.7
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 )
 
 require (
