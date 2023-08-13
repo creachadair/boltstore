@@ -1,6 +1,6 @@
 module github.com/creachadair/boltstore
 
-go 1.19
+go 1.20
 
 require (
 	github.com/creachadair/ffs v0.0.2
