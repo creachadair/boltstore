@@ -7,7 +7,7 @@ toolchain go1.21.0
 require (
 	github.com/creachadair/ffs v0.0.2
 	go.etcd.io/bbolt v1.3.7
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 )
 
 require (
