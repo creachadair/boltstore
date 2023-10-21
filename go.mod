@@ -12,5 +12,5 @@ require (
 
 require (
 	github.com/creachadair/mds v0.2.3 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 )
