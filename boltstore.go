@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package boltstore implements the blob.Store interface using bbolt.
+// Package boltstore implements the [blob.KV] interface using bbolt.
 package boltstore
 
 import (
@@ -24,16 +24,16 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-// Store implements the blob.Store interface using a bbolt database.
-type Store struct {
+// KV implements the [blob.KV] interface using a bbolt database.
+type KV struct {
 	db     *bbolt.DB
 	bucket []byte
 }
 
-// Opener constructs a Store from an address comprising a path, for use with
-// the store package. If addr has the form name@path, the name is used as the
+// Opener constructs a [KV] from an address comprising a path, for use with the
+// store package. If addr has the form name@path, the name is used as the
 // bucket label.
-func Opener(_ context.Context, addr string) (blob.Store, error) {
+func Opener(_ context.Context, addr string) (blob.KV, error) {
 	// TODO: Parse other options out of the address string somehow.
 	path, bucket := addr, ""
 	if i := strings.Index(addr, "@"); i > 0 {
@@ -42,13 +42,13 @@ func Opener(_ context.Context, addr string) (blob.Store, error) {
 	return Open(path, &Options{Bucket: bucket})
 }
 
-// Open creates a Store by opening the bbolt database specified by opts.
-func Open(path string, opts *Options) (*Store, error) {
+// Open creates a [KV] by opening the bbolt database specified by opts.
+func Open(path string, opts *Options) (*KV, error) {
 	db, err := bbolt.Open(path, opts.fileMode(), opts.boltOptions())
 	if err != nil {
 		return nil, err
 	}
-	s := &Store{db: db, bucket: []byte(opts.bucket("blobs"))}
+	s := &KV{db: db, bucket: []byte(opts.bucket("blobs"))}
 	if err := db.Update(func(tx *bbolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists(s.bucket)
 		return err
@@ -89,12 +89,12 @@ func (o *Options) boltOptions() *bbolt.Options {
 	return o.BoltOptions
 }
 
-// Close implements part of the blob.Store interface. It closes the underlying
+// Close implements part of the [blob.KV] interface. It closes the underlying
 // database instance and reports its result.
-func (s *Store) Close(_ context.Context) error { return s.db.Close() }
+func (s *KV) Close(_ context.Context) error { return s.db.Close() }
 
-// Get implements part of blob.Store.
-func (s *Store) Get(_ context.Context, key string) (data []byte, err error) {
+// Get implements part of [blob.KV].
+func (s *KV) Get(_ context.Context, key string) (data []byte, err error) {
 	if key == "" {
 		return nil, blob.KeyNotFound(key) // bolt does not store empty keys
 	}
@@ -115,8 +115,8 @@ func copyOf(data []byte) []byte {
 	return cp
 }
 
-// Put implements part of blob.Store.
-func (s *Store) Put(_ context.Context, opts blob.PutOptions) error {
+// Put implements part of [blob.KV].
+func (s *KV) Put(_ context.Context, opts blob.PutOptions) error {
 	key := []byte(opts.Key)
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(s.bucket)
@@ -127,8 +127,8 @@ func (s *Store) Put(_ context.Context, opts blob.PutOptions) error {
 	})
 }
 
-// Delete implements part of blob.Store.
-func (s *Store) Delete(_ context.Context, key string) error {
+// Delete implements part of [blob.KV].
+func (s *KV) Delete(_ context.Context, key string) error {
 	if key == "" {
 		return blob.KeyNotFound(key) // bolt cannot store empty keys
 	}
@@ -142,8 +142,8 @@ func (s *Store) Delete(_ context.Context, key string) error {
 	})
 }
 
-// List implements part of blob.Store.
-func (s *Store) List(ctx context.Context, start string, f func(string) error) error {
+// List implements part of [blob.KV].
+func (s *KV) List(ctx context.Context, start string, f func(string) error) error {
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		c := tx.Bucket(s.bucket).Cursor()
 
@@ -164,8 +164,8 @@ func (s *Store) List(ctx context.Context, start string, f func(string) error) er
 	return err
 }
 
-// Len implements part of blob.Store.
-func (s *Store) Len(ctx context.Context) (int64, error) {
+// Len implements part of [blob.KV].
+func (s *KV) Len(ctx context.Context) (int64, error) {
 	var count int64
 	err := s.List(ctx, "", func(string) error {
 		count++
