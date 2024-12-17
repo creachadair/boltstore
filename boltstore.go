@@ -17,12 +17,72 @@ package boltstore
 
 import (
 	"context"
+	"errors"
 	"os"
-	"strings"
+	"sync"
 
 	"github.com/creachadair/ffs/blob"
+	"github.com/creachadair/ffs/storage/dbkey"
 	"go.etcd.io/bbolt"
 )
+
+// Store implements the [blob.StoreCloser] interface using a bbolt database.
+type Store struct {
+	*dbMonitor
+}
+
+type dbMonitor struct {
+	db     *bbolt.DB
+	prefix dbkey.Prefix
+
+	μ    sync.Mutex
+	subs map[string]*dbMonitor
+	kvs  map[string]KV
+}
+
+// Keyspace implements part of the [blob.Store] interface.
+// The result of a successful call has concrete type [KV].
+func (d *dbMonitor) Keyspace(ctx context.Context, name string) (blob.KV, error) {
+	d.μ.Lock()
+	defer d.μ.Unlock()
+
+	kv, ok := d.kvs[name]
+	if !ok {
+		pfx := d.prefix.Keyspace(name)
+		kv = KV{db: d.db, bucket: []byte(pfx)}
+		if err := d.db.Update(func(tx *bbolt.Tx) error {
+			_, err := tx.CreateBucketIfNotExists(kv.bucket)
+			return err
+		}); err != nil {
+			return nil, err
+		}
+		d.kvs[name] = kv
+	}
+	return kv, nil
+}
+
+// Sub implements part of the [blob.Store] interface.
+func (d *dbMonitor) Sub(ctx context.Context, name string) (blob.Store, error) {
+	d.μ.Lock()
+	defer d.μ.Unlock()
+
+	sub, ok := d.subs[name]
+	if !ok {
+		sub = &dbMonitor{
+			db:     d.db,
+			prefix: d.prefix.Sub(name),
+			subs:   make(map[string]*dbMonitor),
+			kvs:    make(map[string]KV),
+		}
+		// N.B. We don't need to create a bucket in the DB for this, as it does
+		// not contain any keys of its own.
+		d.subs[name] = sub
+	}
+	return sub, nil
+}
+
+// Close implements part of the [blob.StoreCloser] interface.
+func (s Store) Close(_ context.Context) error { return s.db.Close() }
 
 // KV implements the [blob.KV] interface using a bbolt database.
 type KV struct {
@@ -31,29 +91,28 @@ type KV struct {
 }
 
 // Opener constructs a [KV] from an address comprising a path, for use with the
-// store package. If addr has the form name@path, the name is used as the
-// bucket label.
-func Opener(_ context.Context, addr string) (blob.KV, error) {
-	// TODO: Parse other options out of the address string somehow.
-	path, bucket := addr, ""
-	if i := strings.Index(addr, "@"); i > 0 {
-		path, bucket = path[i+1:], path[:i]
-	}
-	return Open(path, &Options{Bucket: bucket})
-}
+// store package.
+func Opener(_ context.Context, addr string) (blob.StoreCloser, error) { return Open(addr, nil) }
 
 // Open creates a [KV] by opening the bbolt database specified by opts.
-func Open(path string, opts *Options) (*KV, error) {
+func Open(path string, opts *Options) (blob.StoreCloser, error) {
 	db, err := bbolt.Open(path, opts.fileMode(), opts.boltOptions())
 	if err != nil {
 		return nil, err
 	}
-	s := &KV{db: db, bucket: []byte(opts.bucket("blobs"))}
-	if err := db.Update(func(tx *bbolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(s.bucket)
-		return err
-	}); err != nil {
-		return nil, err
+	s := Store{dbMonitor: &dbMonitor{
+		db:     db,
+		prefix: opts.prefix(),
+		subs:   make(map[string]*dbMonitor),
+		kvs:    make(map[string]KV),
+	}}
+	if s.prefix != "" {
+		if err := db.Update(func(tx *bbolt.Tx) error {
+			_, err := tx.CreateBucketIfNotExists([]byte(s.prefix))
+			return err
+		}); err != nil {
+			return nil, err
+		}
 	}
 	return s, nil
 }
@@ -61,7 +120,7 @@ func Open(path string, opts *Options) (*KV, error) {
 // Options provides options for opening a bbolt database.
 type Options struct {
 	Mode        os.FileMode
-	Bucket      string
+	Prefix      string
 	BoltOptions *bbolt.Options
 }
 
@@ -72,11 +131,11 @@ func (o *Options) fileMode() os.FileMode {
 	return o.Mode
 }
 
-func (o *Options) bucket(fallback string) string {
-	if o == nil || o.Bucket == "" {
-		return fallback
+func (o *Options) prefix() dbkey.Prefix {
+	if o == nil {
+		return ""
 	}
-	return o.Bucket
+	return dbkey.Prefix(o.Prefix)
 }
 
 func (o *Options) boltOptions() *bbolt.Options {
@@ -91,10 +150,10 @@ func (o *Options) boltOptions() *bbolt.Options {
 
 // Close implements part of the [blob.KV] interface. It closes the underlying
 // database instance and reports its result.
-func (s *KV) Close(_ context.Context) error { return s.db.Close() }
+func (s KV) Close(_ context.Context) error { return s.db.Close() }
 
 // Get implements part of [blob.KV].
-func (s *KV) Get(_ context.Context, key string) (data []byte, err error) {
+func (s KV) Get(_ context.Context, key string) (data []byte, err error) {
 	if key == "" {
 		return nil, blob.KeyNotFound(key) // bolt does not store empty keys
 	}
@@ -116,7 +175,7 @@ func copyOf(data []byte) []byte {
 }
 
 // Put implements part of [blob.KV].
-func (s *KV) Put(_ context.Context, opts blob.PutOptions) error {
+func (s KV) Put(_ context.Context, opts blob.PutOptions) error {
 	key := []byte(opts.Key)
 	return s.db.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket(s.bucket)
@@ -128,7 +187,7 @@ func (s *KV) Put(_ context.Context, opts blob.PutOptions) error {
 }
 
 // Delete implements part of [blob.KV].
-func (s *KV) Delete(_ context.Context, key string) error {
+func (s KV) Delete(_ context.Context, key string) error {
 	if key == "" {
 		return blob.KeyNotFound(key) // bolt cannot store empty keys
 	}
@@ -143,7 +202,7 @@ func (s *KV) Delete(_ context.Context, key string) error {
 }
 
 // List implements part of [blob.KV].
-func (s *KV) List(ctx context.Context, start string, f func(string) error) error {
+func (s KV) List(ctx context.Context, start string, f func(string) error) error {
 	err := s.db.View(func(tx *bbolt.Tx) error {
 		c := tx.Bucket(s.bucket).Cursor()
 
@@ -158,14 +217,14 @@ func (s *KV) List(ctx context.Context, start string, f func(string) error) error
 		}
 		return nil
 	})
-	if err == blob.ErrStopListing {
+	if errors.Is(err, blob.ErrStopListing) {
 		return nil
 	}
 	return err
 }
 
 // Len implements part of [blob.KV].
-func (s *KV) Len(ctx context.Context) (int64, error) {
+func (s KV) Len(ctx context.Context) (int64, error) {
 	var count int64
 	err := s.List(ctx, "", func(string) error {
 		count++
