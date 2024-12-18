@@ -1,5 +1,5 @@
-github.com/creachadair/ffs v0.7.0 h1:m6zUAKOxzA9EotuzfenDBl9/aJ8zt6Ls3yD6X9jbw78=
-github.com/creachadair/ffs v0.7.0/go.mod h1:brk+jY1hwFq+ZbxXHKMXyGN3tF4vxp2XicrvVc1zL7w=
+github.com/creachadair/ffs v0.7.1 h1:Ik0dVegyV1Zf0x9yrtNuwL796rn9Ecy/Dj5GmNIi5so=
+github.com/creachadair/ffs v0.7.1/go.mod h1:PD7OPVlVGEvwg8kAoR8LsqsOFmjo8EERNOEJgtzC4x4=
 github.com/creachadair/mds v0.22.0 h1:IRm4fWRKF9Pi4k3DEfgdlhMMYVxyef9FFall4r0GP4A=
 github.com/creachadair/mds v0.22.0/go.mod h1:ArfS0vPHoLV/SzuIzoqTEZfoYmac7n9Cj8XPANHocvw=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -14,7 +14,7 @@ go.etcd.io/bbolt v1.3.11 h1:yGEzV1wPz2yVCLsD8ZAiGHhHVlczyC9d1rP43/VCRJ0=
 go.etcd.io/bbolt v1.3.11/go.mod h1:dksAq7YMXoljX0xu6VF5DMZGbhYYoLUalEiSySYAS4I=
 golang.org/x/sync v0.7.0 h1:YsImfSBoP9QPYL0xyKJPq0gcaJdG3rInoqxTWbfQu9M=
 golang.org/x/sync v0.7.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
-golang.org/x/sys v0.27.0 h1:wBqf8DvsY9Y/2P8gAfPDEYNuS30J4lPHJxXSb/nJZ+s=
-golang.org/x/sys v0.27.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
+golang.org/x/sys v0.28.0 h1:Fksou7UEQUWlKvIdsqzJmUmCX3cZuD2+P3XyyzwMhlA=
+golang.org/x/sys v0.28.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
