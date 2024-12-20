@@ -19,70 +19,19 @@ import (
 	"context"
 	"errors"
 	"os"
-	"sync"
 
 	"github.com/creachadair/ffs/blob"
 	"github.com/creachadair/ffs/storage/dbkey"
+	"github.com/creachadair/ffs/storage/monitor"
 	"go.etcd.io/bbolt"
 )
 
 // Store implements the [blob.StoreCloser] interface using a bbolt database.
 type Store struct {
-	*dbMonitor
+	*monitor.M[*bbolt.DB, KV]
 }
 
-type dbMonitor struct {
-	db     *bbolt.DB
-	prefix dbkey.Prefix
-
-	μ    sync.Mutex
-	subs map[string]*dbMonitor
-	kvs  map[string]KV
-}
-
-// Keyspace implements part of the [blob.Store] interface.
-// The result of a successful call has concrete type [KV].
-func (d *dbMonitor) Keyspace(ctx context.Context, name string) (blob.KV, error) {
-	d.μ.Lock()
-	defer d.μ.Unlock()
-
-	kv, ok := d.kvs[name]
-	if !ok {
-		pfx := d.prefix.Keyspace(name)
-		kv = KV{db: d.db, bucket: []byte(pfx)}
-		if err := d.db.Update(func(tx *bbolt.Tx) error {
-			_, err := tx.CreateBucketIfNotExists(kv.bucket)
-			return err
-		}); err != nil {
-			return nil, err
-		}
-		d.kvs[name] = kv
-	}
-	return kv, nil
-}
-
-// Sub implements part of the [blob.Store] interface.
-func (d *dbMonitor) Sub(ctx context.Context, name string) (blob.Store, error) {
-	d.μ.Lock()
-	defer d.μ.Unlock()
-
-	sub, ok := d.subs[name]
-	if !ok {
-		sub = &dbMonitor{
-			db:     d.db,
-			prefix: d.prefix.Sub(name),
-			subs:   make(map[string]*dbMonitor),
-			kvs:    make(map[string]KV),
-		}
-		// N.B. We don't need to create a bucket in the DB for this, as it does
-		// not contain any keys of its own.
-		d.subs[name] = sub
-	}
-	return sub, nil
-}
-
-// Close implements part of the [blob.StoreCloser] interface.
-func (s Store) Close(_ context.Context) error { return s.db.Close() }
+func (s Store) Close(context.Context) error { return s.M.DB.Close() }
 
 // KV implements the [blob.KV] interface using a bbolt database.
 type KV struct {
@@ -100,15 +49,24 @@ func Open(path string, opts *Options) (blob.StoreCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	s := Store{dbMonitor: &dbMonitor{
-		db:     db,
-		prefix: opts.prefix(),
-		subs:   make(map[string]*dbMonitor),
-		kvs:    make(map[string]KV),
-	}}
-	if s.prefix != "" {
+	rootPrefix := opts.prefix()
+	s := Store{M: monitor.New(monitor.Config[*bbolt.DB, KV]{
+		DB:     db,
+		Prefix: rootPrefix,
+		NewKV: func(_ context.Context, db *bbolt.DB, pfx dbkey.Prefix, _ string) (KV, error) {
+			out := KV{db: db, bucket: []byte(pfx)}
+			if err := db.Update(func(tx *bbolt.Tx) error {
+				_, err := tx.CreateBucketIfNotExists(out.bucket)
+				return err
+			}); err != nil {
+				return KV{}, err
+			}
+			return out, nil
+		},
+	})}
+	if rootPrefix != "" {
 		if err := db.Update(func(tx *bbolt.Tx) error {
-			_, err := tx.CreateBucketIfNotExists([]byte(s.prefix))
+			_, err := tx.CreateBucketIfNotExists([]byte(rootPrefix))
 			return err
 		}); err != nil {
 			return nil, err
@@ -147,10 +105,6 @@ func (o *Options) boltOptions() *bbolt.Options {
 	}
 	return o.BoltOptions
 }
-
-// Close implements part of the [blob.KV] interface. It closes the underlying
-// database instance and reports its result.
-func (s KV) Close(_ context.Context) error { return s.db.Close() }
 
 // Get implements part of [blob.KV].
 func (s KV) Get(_ context.Context, key string) (data []byte, err error) {
