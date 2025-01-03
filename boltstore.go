@@ -122,6 +122,21 @@ func (s KV) Get(_ context.Context, key string) (data []byte, err error) {
 	return
 }
 
+// Stat implements part of [blob.KV].
+func (s KV) Stat(_ context.Context, keys ...string) (out blob.StatMap, err error) {
+	out = make(blob.StatMap)
+	err = s.db.View(func(tx *bbolt.Tx) error {
+		for _, key := range keys {
+			value := tx.Bucket(s.bucket).Get([]byte(key))
+			if value != nil {
+				out[key] = blob.Stat{Size: int64(len(value))}
+			}
+		}
+		return nil
+	})
+	return
+}
+
 func copyOf(data []byte) []byte {
 	cp := make([]byte, len(data))
 	copy(cp, data)
