@@ -122,19 +122,19 @@ func (s KV) Get(_ context.Context, key string) (data []byte, err error) {
 	return
 }
 
-// Stat implements part of [blob.KV].
-func (s KV) Stat(_ context.Context, keys ...string) (out blob.StatMap, err error) {
-	out = make(blob.StatMap)
-	err = s.db.View(func(tx *bbolt.Tx) error {
+// Has implements part of [blob.KV].
+func (s KV) Has(_ context.Context, keys ...string) (blob.KeySet, error) {
+	var out blob.KeySet
+	err := s.db.View(func(tx *bbolt.Tx) error {
 		for _, key := range keys {
 			value := tx.Bucket(s.bucket).Get([]byte(key))
 			if value != nil {
-				out[key] = blob.Stat{Size: int64(len(value))}
+				out.Add(key)
 			}
 		}
 		return nil
 	})
-	return
+	return out, err
 }
 
 func copyOf(data []byte) []byte {
