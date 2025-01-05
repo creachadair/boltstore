@@ -17,7 +17,7 @@ package boltstore
 
 import (
 	"context"
-	"errors"
+	"iter"
 	"os"
 
 	"github.com/creachadair/ffs/blob"
@@ -171,33 +171,34 @@ func (s KV) Delete(_ context.Context, key string) error {
 }
 
 // List implements part of [blob.KV].
-func (s KV) List(ctx context.Context, start string, f func(string) error) error {
-	err := s.db.View(func(tx *bbolt.Tx) error {
-		c := tx.Bucket(s.bucket).Cursor()
+func (s KV) List(ctx context.Context, start string) iter.Seq2[string, error] {
+	return func(yield func(string, error) bool) {
+		err := s.db.View(func(tx *bbolt.Tx) error {
+			c := tx.Bucket(s.bucket).Cursor()
 
-		k, _ := c.Seek([]byte(start))
-		for k != nil {
-			if err := f(string(k)); err != nil {
-				return err
-			} else if err := ctx.Err(); err != nil {
-				return err
+			k, _ := c.Seek([]byte(start))
+			for k != nil {
+				if !yield(string(k), nil) {
+					return nil
+				}
+				k, _ = c.Next()
 			}
-			k, _ = c.Next()
+			return nil
+		})
+		if err != nil {
+			yield("", err)
 		}
-		return nil
-	})
-	if errors.Is(err, blob.ErrStopListing) {
-		return nil
 	}
-	return err
 }
 
 // Len implements part of [blob.KV].
 func (s KV) Len(ctx context.Context) (int64, error) {
 	var count int64
-	err := s.List(ctx, "", func(string) error {
+	for _, err := range s.List(ctx, "") {
+		if err != nil {
+			return 0, err
+		}
 		count++
-		return nil
-	})
-	return count, err
+	}
+	return count, nil
 }
