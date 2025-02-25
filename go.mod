@@ -13,5 +13,5 @@ require (
 require (
 	github.com/creachadair/mds v0.24.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	golang.org/x/crypto v0.34.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 )
