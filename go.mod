@@ -2,8 +2,6 @@ module github.com/creachadair/boltstore
 
 go 1.24
 
-toolchain go1.24.1
-
 require (
 	github.com/creachadair/ffs v0.13.16
 	go.etcd.io/bbolt v1.4.0
