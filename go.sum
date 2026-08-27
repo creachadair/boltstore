@@ -1,7 +1,7 @@
 github.com/creachadair/atomicfile v0.4.2 h1:pSSsKxmUefqCTg+QgyCG2bw1KmsB76apBL4lhJjichI=
 github.com/creachadair/atomicfile v0.4.2/go.mod h1:ts9VunJluQvSXtkrl0YlDn9ckZaS+eMkBW2g20gB5II=
-github.com/creachadair/ffs v0.18.2 h1:ohkrWgP5LHKflJ9sUaAVN1xKfwcUZTgYHuFzQC2MYXA=
-github.com/creachadair/ffs v0.18.2/go.mod h1:Xc4Y5IUk5OJMLvJkFgVI7yhyQGMb7WtuO/qWXJJdyTk=
+github.com/creachadair/ffs v0.18.3 h1:qReSA3VJrQGW3uiuswhfEjQ8LuslcBMiRnPz/6XfLgk=
+github.com/creachadair/ffs v0.18.3/go.mod h1:+utW86JHlWTJzZS1ht4MTkmnGwYIjfI2dt3qxquw5RA=
 github.com/creachadair/mds v0.30.5 h1:JtylThbC3wUndriq7yZiY23AD0L7ZaKSvx3XQwQk8FI=
 github.com/creachadair/mds v0.30.5/go.mod h1:NGUd6kGUG0qQd2kgGOqb8NzakLnSmWZ5be2pHZsrBN4=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -14,8 +14,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 go.etcd.io/bbolt v1.5.0 h1:S7GAl7Fxv12yohbwFfIbQCGDWbQbtDGPET4P/bD4lxU=
 go.etcd.io/bbolt v1.5.0/go.mod h1:mkltfYE5aUHQxUct9N9V+Kp7aSjFqjgrhcXIS70Lrdk=
-golang.org/x/crypto v0.54.0 h1:YLIA59K4fiNzHzjnZt2tUJQjQtUWfWbeHBqKtk3eScw=
-golang.org/x/crypto v0.54.0/go.mod h1:KWL8ny2AZdGR2cWmzeHrp2azQPGogOv+HeQaVEXC2dk=
+golang.org/x/crypto v0.55.0 h1:+KWHjbgOaAQ66dh/YlkZKHlz9ZUlq61AFirAR9ntP8M=
+golang.org/x/crypto v0.55.0/go.mod h1:uq0V9dE/fzQuJtbnL+2EhWOE63vo164FY8xqEnV9xis=
 golang.org/x/sync v0.20.0 h1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=
 golang.org/x/sync v0.20.0/go.mod h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=
 golang.org/x/sys v0.47.0 h1:o7XGOvZQCADBQQ4Y7VNq2dRWQR7JmOUW8Kxx4ZsNgWs=
