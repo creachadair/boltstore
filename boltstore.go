@@ -16,6 +16,7 @@
 package boltstore
 
 import (
+	"bytes"
 	"context"
 	"iter"
 	"os"
@@ -116,7 +117,7 @@ func (s KV) Get(_ context.Context, key string) (data []byte, err error) {
 		if value == nil {
 			return blob.KeyNotFound(key)
 		}
-		data = copyOf(value)
+		data = bytes.Clone(value)
 		return nil
 	})
 	return
@@ -135,12 +136,6 @@ func (s KV) Has(_ context.Context, keys ...string) (blob.KeySet, error) {
 		return nil
 	})
 	return out, err
-}
-
-func copyOf(data []byte) []byte {
-	cp := make([]byte, len(data))
-	copy(cp, data)
-	return cp
 }
 
 // Put implements part of [blob.KV].
